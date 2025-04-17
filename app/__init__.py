@@ -50,6 +50,9 @@ def create_app():
     return app
 
 def create_admin_user():
+    # Import User model inside the function where it is used
+    from .models import User  # <-- Add this line here to ensure the User model is available
+
     # Ensure the table is created before trying to insert
     db.create_all()
 
