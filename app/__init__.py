@@ -1,3 +1,5 @@
+# app/__init__.py
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -13,30 +15,38 @@ login_manager.login_view = "main.login"
 def create_app():
     app = Flask(__name__)
 
+    # Load configuration
     app.config.from_pyfile('../instance/config.py')
 
-    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static', 'uploads')
+    # Set up upload folder
+    app.config['UPLOAD_FOLDER'] = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        'static',
+        'uploads'
+    )
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+    # Initialize extensions with app
     bcrypt.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
 
+    # Import models and set up user loader
     from .models import User
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    # Register blueprints
     from .routes import main
     app.register_blueprint(main)
 
-    # Create tables here
-    @app.before_first_request
-    def create_tables():
+    # Auto-create all tables immediately on app startup
+    with app.app_context():
         db.create_all()
 
-    # Optional admin user creation block 
+    # Optional: Admin user creation block (uncomment if needed)
     """
     def create_admin_user():
         with app.app_context():
@@ -49,9 +59,9 @@ def create_app():
                 db.session.commit()
                 print("Admin user created.")
             else:
-                print("ℹAdmin user already exists.")
+                print("Admin user already exists.")
 
     create_admin_user()
     """
 
-    return app  
+    return app
