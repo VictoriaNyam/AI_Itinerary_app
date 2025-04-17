@@ -3,7 +3,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from app import db
-from app.models import POI
+from app.models import POI, Itinerary  # Added Itinerary import
+from flask_login import current_user  # Added current_user import
 from math import radians, cos, sin, sqrt, atan2
 
 # Configuration: fixed clusters and POI limit per cluster
@@ -154,18 +155,23 @@ def generate_itineraries(representative_pois, selected_activities, days):
         print(f"Day {day_num}: before {before:.2f} km, after {after:.2f} km, improvement {before-after:.2f} km")
         final.append(optimized)
 
-    # Persist to DB
-    for itin in final:
-        for poi in itin:
-            db.session.add(POI(
+    # Persist to DB using relationships
+    for day_index, itin_list in enumerate(final, start=1):
+        itin = Itinerary(
+            user_id=current_user.id,
+            name=f"Itinerary Day {day_index}"
+        )
+        for poi in itin_list:
+            poi_obj = POI(
                 name=poi['name'],
                 address=poi['address'],
                 latitude=poi['latitude'],
                 longitude=poi['longitude'],
                 original_latitude=poi['latitude'],
                 original_longitude=poi['longitude'],
-                day=poi['day'],
-                itinerary_id=1
-            ))
+                day=poi['day']
+            )
+            itin.pois.append(poi_obj)
+        db.session.add(itin)
     db.session.commit()
     return final
