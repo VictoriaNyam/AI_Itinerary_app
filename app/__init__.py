@@ -47,6 +47,6 @@ def create_app():
 
     #create_admin_user()  # 🔁 Run the admin creation function
 
-   return app
+return app
 
 
