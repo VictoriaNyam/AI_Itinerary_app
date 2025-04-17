@@ -31,6 +31,11 @@ def create_app():
     from .routes import main
     app.register_blueprint(main)
 
+    # Create tables here
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
     # Optional admin user creation block 
     """
     def create_admin_user():
