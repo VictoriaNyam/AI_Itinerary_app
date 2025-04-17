@@ -47,7 +47,7 @@ def create_app():
         db.create_all()
 
     # Optional: Admin user creation block (uncomment if needed)
-    """
+    
     def create_admin_user():
         with app.app_context():
             admin_email = "admin@example.com"
@@ -62,6 +62,6 @@ def create_app():
                 print("Admin user already exists.")
 
     create_admin_user()
-    """
+    
 
     return app
