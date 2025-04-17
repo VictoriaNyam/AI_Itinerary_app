@@ -47,7 +47,7 @@ def create_app():
         # Seed admin user if not already present
         def create_admin_user():
             admin_email = "admin@example.com"
-            admin_password = "admin123"  # Change to a secure password in production
+            admin_password = "admin123" 
 
             if not User.query.filter_by(email=admin_email).first():
                 admin = User(
@@ -59,9 +59,9 @@ def create_app():
                 admin.set_password(admin_password)
                 db.session.add(admin)
                 db.session.commit()
-                app.logger.info("Admin user created.")
+                app.logger.info(" Admin user created.")
             else:
-                app.logger.info("ℹAdmin user already exists.")
+                app.logger.info(" Admin user already exists.")
 
         create_admin_user()
 
