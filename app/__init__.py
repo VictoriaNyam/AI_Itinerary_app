@@ -46,23 +46,28 @@ def create_app():
 
         # Seed admin user if not already present
         def create_admin_user():
-            admin_email = "admin@example.com"
-            admin_password = "admin123" 
+    # Ensure the table is created before trying to insert
+    db.create_all()
 
-            if not User.query.filter_by(email=admin_email).first():
-                admin = User(
-                    username="admin",
-                    email=admin_email,
-                    is_admin=True
-                )
-                # Hash and set the password using the model's helper
-                admin.set_password(admin_password)
-                db.session.add(admin)
-                db.session.commit()
-                app.logger.info(" Admin user created.")
-            else:
-                app.logger.info(" Admin user already exists.")
+    # Check if the admin user already exists
+    admin = User.query.filter_by(username="admin").first()
 
-        create_admin_user()
+    if admin is None:
+        admin_email = "admin@example.com"
+        admin_password = "admin123"
+        
+        # Create the user but don't pass the password directly
+        admin = User(username="admin", email=admin_email, is_admin=True)
+        
+        # Set the password using the method
+        admin.set_password(admin_password)
+        
+        # Add and commit the new admin user to the database
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin user created!")
+    else:
+        print("Admin user already exists.")
+
 
     return app
