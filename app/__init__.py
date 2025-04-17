@@ -45,7 +45,11 @@ def create_app():
         db.create_all()
 
         # Seed admin user if not already present
-        def create_admin_user():
+        create_admin_user()
+
+    return app
+
+def create_admin_user():
     # Ensure the table is created before trying to insert
     db.create_all()
 
@@ -68,6 +72,3 @@ def create_app():
         print("Admin user created!")
     else:
         print("Admin user already exists.")
-
-
-    return app
