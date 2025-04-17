@@ -1,5 +1,3 @@
-# app/__init__.py
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -31,7 +29,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
-    # Import models and set up user loader
+    # Import User model for user loader and admin seeding
     from .models import User
 
     @login_manager.user_loader
@@ -42,26 +40,29 @@ def create_app():
     from .routes import main
     app.register_blueprint(main)
 
-    # Auto-create all tables immediately on app startup
+    # Auto-create all tables and seed admin user
     with app.app_context():
         db.create_all()
 
-    # Optional: Admin user creation block (uncomment if needed)
-    
-    def create_admin_user():
-        with app.app_context():
+        # Seed admin user if not already present
+        def create_admin_user():
             admin_email = "admin@example.com"
-            admin_user = User.query.filter_by(email=admin_email).first()
-            if not admin_user:
-                hashed_pw = bcrypt.generate_password_hash("admin123").decode("utf-8")
-                admin = User(username="admin", email=admin_email, password=hashed_pw, is_admin=True)
+            admin_password = "admin123"  # Change to a secure password in production
+
+            if not User.query.filter_by(email=admin_email).first():
+                admin = User(
+                    username="admin",
+                    email=admin_email,
+                    is_admin=True
+                )
+                # Hash and set the password using the model's helper
+                admin.set_password(admin_password)
                 db.session.add(admin)
                 db.session.commit()
-                print("Admin user created.")
+                app.logger.info("Admin user created.")
             else:
-                print("Admin user already exists.")
+                app.logger.info("ℹAdmin user already exists.")
 
-    create_admin_user()
-    
+        create_admin_user()
 
     return app
