@@ -32,22 +32,22 @@ def create_app():
     app.register_blueprint(main)
 
     # ✅ Auto-create admin user if not already in DB
-    def create_admin_user():
-        with app.app_context():
-            admin_email = "admin@example.com"
-            admin_user = User.query.filter_by(email=admin_email).first()
-            if not admin_user:
-                hashed_pw = bcrypt.generate_password_hash("admin123").decode("utf-8")
-                admin = User(username="admin", email=admin_email, password=hashed_pw, is_admin=True)
-                db.session.add(admin)
-                db.session.commit()
-                print("✅ Admin user created.")
-            else:
-                print("ℹ️ Admin user already exists.")
+   # def create_admin_user():
+      #  with app.app_context():
+           # admin_email = "admin@example.com"
+           # admin_user = User.query.filter_by(email=admin_email).first()
+          #  if not admin_user:
+               # hashed_pw = bcrypt.generate_password_hash("admin123").decode("utf-8")
+               # admin = User(username="admin", email=admin_email, password=hashed_pw, is_admin=True)
+               # db.session.add(admin)
+              #  db.session.commit()
+              #  print("✅ Admin user created.")
+          #  else:
+                #print("ℹ️ Admin user already exists.")
 
-    create_admin_user()  # 🔁 Run the admin creation function
+    #create_admin_user()  # 🔁 Run the admin creation function
 
-    return app
+   # return app
 
 # Create the app instance
 app = create_app()
