@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Content Gallery</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    .header {
+      background: linear-gradient(to right, #007bff, #00bcd4);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      border-bottom: 4px solid #e3f2fd;
+    }
+    .upload-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+    }
+    .btn-gradient {
+      background: linear-gradient(to right, #007bff, #00bcd4);
+      color: white;
+      border: none;
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(to right, #0062cc, #00acc1);
+    }
+    .blog-icon {
+      font-size: 4rem;
+      color: #007bff;
+    }
+    .comment-box {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 0.5rem;
+    }
+    .comment-text {
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>🖼️ Explore Travel Blogs & Vlogs</h1>
+    <p>Get inspired by stories and experiences shared by fellow travelers!</p>
+  </header>
+
+  <div class="container my-4">
+    <div class="text-end mb-3">
+      <a href="{{ url_for('main.upload') }}" class="btn btn-outline-primary me-2">📤 Upload Your Content</a>
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">🏠 Back to Dashboard</a>
+    </div>
+
+    <!-- Blogs Section -->
+    <div class="upload-card">
+      <h3>📝 Blogs</h3>
+      {% if blogs %}
+        <div class="row">
+          {% for blog in blogs %}
+            <div class="col-md-4 mb-4">
+              <div class="card h-100 text-center p-3">
+                <div class="blog-icon">📄</div>
+                <div class="card-body">
+                  <h5 class="card-title">{{ blog.filename }}</h5>
+                  <a href="{{ url_for('static', filename='uploads/' + blog.filename) }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">Read Blog</a>
+
+                  <!-- Likes & Comments -->
+                  <div class="comment-box">
+                    <!-- Like -->
+                    <form action="{{ url_for('main.like_upload', upload_id=blog.id) }}" method="POST" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-outline-danger me-2">❤️ Like</button>
+                    </form>
+
+                    <!-- Comment -->
+                    <form action="{{ url_for('main.comment_upload', upload_id=blog.id) }}" method="POST" class="mt-2">
+                      <div class="input-group input-group-sm">
+                        <input type="text" name="content" class="form-control" placeholder="Write a comment..." required>
+                        <button class="btn btn-outline-secondary" type="submit">Post</button>
+                      </div>
+                    </form>
+
+                    <!-- Show Comments -->
+                    {% if blog.comments %}
+                      <div class="mt-2">
+                        {% for comment in blog.comments %}
+                          <p class="comment-text"><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No blog uploads yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Vlogs Section -->
+    <div class="upload-card">
+      <h3>📹 Vlogs</h3>
+      {% if vlogs %}
+        <div class="row">
+          {% for vlog in vlogs %}
+            <div class="col-md-6 mb-4">
+              <div class="card h-100">
+                {% if vlog.vlog_url %}
+                  <div class="ratio ratio-16x9">
+                    <iframe src="{{ vlog.vlog_url | replace('watch?v=', 'embed/') }}" title="Vlog Preview" allowfullscreen></iframe>
+                  </div>
+                {% elif vlog.vlog_file_url %}
+                  <video class="w-100" controls>
+                    <source src="{{ vlog.vlog_file_url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                {% endif %}
+                <div class="card-body">
+                  <h5 class="card-title">{{ vlog.vlog_title or 'Untitled Vlog' }}</h5>
+
+                  {% if vlog.vlog_url %}
+                    <a href="{{ vlog.vlog_url }}" class="btn btn-sm btn-outline-success mt-2" target="_blank">Watch on YouTube</a>
+                  {% elif vlog.vlog_file_url %}
+                    <a href="{{ vlog.vlog_file_url }}" class="btn btn-sm btn-outline-success mt-2" target="_blank">Open Video</a>
+                  {% endif %}
+
+                  <!-- Likes & Comments -->
+                  <div class="comment-box">
+                    <form action="{{ url_for('main.like_upload', upload_id=vlog.id) }}" method="POST" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-outline-danger me-2">❤️ Like</button>
+                    </form>
+
+                    <form action="{{ url_for('main.comment_upload', upload_id=vlog.id) }}" method="POST" class="mt-2">
+                      <div class="input-group input-group-sm">
+                        <input type="text" name="content" class="form-control" placeholder="Write a comment..." required>
+                        <button class="btn btn-outline-secondary" type="submit">Post</button>
+                      </div>
+                    </form>
+
+                    {% if vlog.comments %}
+                      <div class="mt-2">
+                        {% for comment in vlog.comments %}
+                          <p class="comment-text"><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No vlog uploads yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

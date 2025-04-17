@@ -1,0 +1,70 @@
+<!-- app/templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Header Section with Intro -->
+  <header class="header">
+    <h1>Welcome, {{ username }}!</h1>
+    <p>
+      <i>Your gateway to exciting London adventures – plan trips, share experiences, and explore itineraries.</i>
+      
+    </p>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="{{ url_for('main.dashboard') }}" class="btn-dashboard">Dashboard</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Card for Plan Trip -->
+      <a href="{{ url_for('main.plan_trip') }}" class="dashboard-card text-decoration-none">
+        <img src="{{ url_for('static', filename='icons/icons8-traveler-50.png') }}" alt="Plan Trip Icon">
+        <span class="title">Plan a Trip</span>
+        <span class="description"><i>Tailor your itinerary.</i></span>
+      </a>
+      <!-- Card for Saved Itineraries -->
+      <a href="{{ url_for('main.view_itineraries') }}" class="dashboard-card text-decoration-none">
+        <img src="{{ url_for('static', filename='icons/icons8-check-file-50.png') }}" alt="Saved Itineraries Icon">
+        <span class="title">Saved Itineraries</span>
+        <span class="description"><i>Review past plans.</i></span>
+      </a>
+      <!-- Card for Upload Experience -->
+      <a href="{{ url_for('main.upload') }}" class="dashboard-card text-decoration-none">
+        <img src="{{ url_for('static', filename='icons/icons8-upload-50 (1).png') }}" alt="Upload Experience Icon">
+        <span class="title">Upload Experience</span>
+        <span class="description"><i>Share your memories.</i></span>
+      </a>
+      <!-- Card for Gallery -->
+      <a href="{{ url_for('main.gallery') }}" class="dashboard-card text-decoration-none">
+        <img src="{{ url_for('static', filename='icons/icons8-gallery-50.png') }}" alt="Gallery Icon">
+        <span class="title">Gallery</span>
+        <span class="description"><i>See community vlogs and blogs.</i></span>
+      </a>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="text-center" style="margin-top: 2rem;">
+      <a href="{{ url_for('main.logout') }}" class="btn-custom">Logout</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 Personalized AI Itinerary Planner. All rights reserved.</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!-- app/templates/plan_trip.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plan Your Trip</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Navigation Bar with Dashboard Button -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="{{ url_for('main.dashboard') }}" class="btn-dashboard">Dashboard</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1 class="mt-4 text-center">Plan Your London Itinerary</h1>
+    <!-- Brief description -->
+    <p class="text-center mb-4" style="font-size: 1.1rem; color: #555;">
+      <i><strong>Create a custom itinerary to explore the spots in London. Choose your activities and plan a trip for up to 7 days</strong>.</i>
+      
+    </p>
+    
+    <div class="card-container">
+      <form action="{{ url_for('main.plan_trip') }}" method="POST">
+        <!-- Number of Days Input -->
+        <div class="mb-3">
+          <label for="days" class="form-label fw-semibold">How many days? (Max: 7)</label>
+          <input type="number" class="form-control" name="days" min="1" max="7" required>
+        </div>
+        <!-- Interests Checkboxes -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Select your interests:</label>
+          <div class="form-check">
+            {% for activity in activities %}
+              <input class="form-check-input" type="checkbox" name="interests" value="{{ activity }}" id="activity_{{ loop.index }}">
+              <label class="form-check-label" for="activity_{{ loop.index }}">{{ activity }}</label><br>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button type="submit" class="btn-custom">Generate Itinerary</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 Personalized AI Itinerary Planner</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

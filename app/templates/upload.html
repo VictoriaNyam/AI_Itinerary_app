@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Blog or Vlog</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    .header {
+      background: linear-gradient(to right, #007bff, #00bcd4);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      border-bottom: 4px solid #e3f2fd;
+    }
+    .upload-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-top: 2rem;
+    }
+    .btn-gradient {
+      background: linear-gradient(to right, #007bff, #00bcd4);
+      color: white;
+      border: none;
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(to right, #0062cc, #00acc1);
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>📤 Upload Your Blog or Vlog</h1>
+    <p>Share your travel experiences through text or video and inspire others!</p>
+  </header>
+
+  <!-- Main Upload Form -->
+  <div class="container">
+    <div class="upload-card mx-auto col-lg-8">
+
+      <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <!-- Type Selection -->
+        <div class="mb-4">
+          <label class="form-label fw-bold">Select Type:</label><br>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="upload_type" value="blog" checked id="radioBlog">
+            <label class="form-check-label" for="radioBlog">📝 Blog</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="upload_type" value="vlog" id="radioVlog">
+            <label class="form-check-label" for="radioVlog">📹 Vlog</label>
+          </div>
+        </div>
+
+        <!-- Blog Upload Section -->
+        <div id="blog-upload">
+          <div class="mb-3">
+            <label for="blogFile" class="form-label">Upload a blog file (.txt, .pdf, etc.):</label>
+            <input type="file" class="form-control" name="blog_file" id="blogFile">
+          </div>
+        </div>
+
+        <!-- Vlog Upload Section -->
+        <div id="vlog-upload" style="display: none;">
+          <div class="mb-3">
+            <label for="vlogTitle" class="form-label">Vlog Title:</label>
+            <input type="text" class="form-control" name="vlog_title" id="vlogTitle" placeholder="Short title for your vlog">
+          </div>
+
+          <div class="mb-3">
+            <label for="vlogURL" class="form-label">OR paste a video link (YouTube, etc.):</label>
+            <input type="text" class="form-control" name="vlog_url" id="vlogURL" placeholder="https://...">
+          </div>
+
+          <div class="mb-3">
+            <label for="vlogFile" class="form-label">Upload video file (.mp4, .mov):</label>
+            <input type="file" class="form-control" name="vlog_file" id="vlogFile">
+          </div>
+        </div>
+
+        <!-- Upload Button -->
+        <div class="d-grid mb-4">
+          <button type="submit" class="btn btn-gradient">🚀 Upload Now</button>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="text-center">
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary me-2">🏠 Back to Dashboard</a>
+          <a href="{{ url_for('main.gallery') }}" class="btn btn-outline-info">🖼️ View Other Users’ Content</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Script to toggle upload form -->
+  <script>
+    const blogRadio = document.getElementById('radioBlog');
+    const vlogRadio = document.getElementById('radioVlog');
+    const blogUpload = document.getElementById('blog-upload');
+    const vlogUpload = document.getElementById('vlog-upload');
+
+    function toggleUploadSection() {
+      if (blogRadio.checked) {
+        blogUpload.style.display = 'block';
+        vlogUpload.style.display = 'none';
+      } else {
+        blogUpload.style.display = 'none';
+        vlogUpload.style.display = 'block';
+      }
+    }
+
+    blogRadio.addEventListener('change', toggleUploadSection);
+    vlogRadio.addEventListener('change', toggleUploadSection);
+    toggleUploadSection();
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
