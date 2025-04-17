@@ -1,12 +1,19 @@
+from flask import Flask
+from app.models import db  
 
-# Import the create_app function from the app module to initialize the Flask app
-from app import create_app
+def create_app():
+    app = Flask(__name__)
 
-# Create the app instance by calling the create_app function
-app = create_app()
+    # app config here (e.g., secret key, db URI)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'your-database-url'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Check if the script is run directly (not imported), then run the app
-# debug=True enables auto-reloading and detailed error messages during development
-if __name__ == '__main__':
-    app.run(debug=True)
+    db.init_app(app)
 
+    # Create tables here
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
+
+    # Register blueprints here (if any)
+    return app
