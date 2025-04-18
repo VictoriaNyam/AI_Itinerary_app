@@ -1,4 +1,4 @@
-<!-- app/templates/saved_itineraries.html -->
+<!-- app/templates/saved_itineraries.html --> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,8 +46,8 @@
               <ul class="list-group list-group-flush mb-2">
                 {% for poi in pois %}
                   <li class="list-group-item">
-                    {{ poi.name }}
-                    <small class="text-muted">({{ poi.original_latitude }}, {{ poi.original_longitude }})</small>
+                    <strong>{{ poi.name }}</strong><br>
+                    <span class="text-muted">📍 {{ poi.address }}</span>
                   </li>
                 {% endfor %}
               </ul>
