@@ -41,7 +41,14 @@
           </div>
           <ul class="list-group list-group-flush">
             {% for poi in items %}
-              <li class="list-group-item">{{ poi['name'] }}</li>
+              <li class="list-group-item"><b>{{ poi['name'] }}</b><br>
+                <i>Address: {{ poi['address'] }}</i><br>
+                <i>Activities: 
+                  {% for activity, value in poi.items() %}
+                    {% if activity in activity_columns and value == 1 %}
+                      {{ activity }}{% if not loop.last %}, {% endif %}
+                    {% endif %}
+                  {% endfor %}</li>
             {% endfor %}
           </ul>
         </div>
