@@ -149,7 +149,7 @@ def plan_trip():
         # Generate itineraries based on the selected POIs and activities
         itineraries = generate_itineraries(representative_pois, selected_activities, days)
 
-        return render_template('show_itinerary.html', itineraries=itineraries)
+        return render_template('show_itinerary.html', itineraries=itineraries, activity_columns=activity_cols)
 
     return render_template('plan_trip.html', activities=activity_cols)
 
@@ -211,20 +211,22 @@ def save_itinerary():
 
     return redirect(url_for('main.view_itineraries'))
 
-# View Itineraries Route - Display a list of all saved itineraries for the user
 @main.route('/view_itineraries')
 @login_required
 def view_itineraries():
+    activity_cols = [
+        'nature', 'nightlife', 'drink', 'music', 'dance', 'history',
+        'sports', 'art', 'museum', 'walk', 'restaurant', 'movie'
+    ]
+    
     itineraries = Itinerary.query.filter_by(user_id=current_user.id).all()
     itineraries_grouped = []
 
-    # Group the POIs in each itinerary by day
     for itinerary in itineraries:
         pois_by_day = {}
         for poi in itinerary.pois:
             pois_by_day.setdefault(poi.day, []).append(poi)
         
-        # Sort the POIs by day
         grouped_pois = sorted(pois_by_day.items(), key=lambda item: item[0])
         
         itineraries_grouped.append({
@@ -232,7 +234,7 @@ def view_itineraries():
             'grouped_pois': grouped_pois
         })
     
-    return render_template('view_itineraries.html', itineraries_grouped=itineraries_grouped)
+    return render_template('view_itineraries.html', itineraries_grouped=itineraries_grouped, activity_columns=activity_cols)
 
 # View Itinerary Map Route - Display a map for a specific itinerary
 @main.route('/view_itinerary_map/<int:itinerary_id>')
