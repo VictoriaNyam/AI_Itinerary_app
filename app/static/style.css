@@ -180,23 +180,31 @@
   }
  /* For mobile devices: always show the gradient border */
  @media (hover: none) and (max-width: 768px) {
-    .dashboard-card {
-      border-image: linear-gradient(135deg, #0077ff, #ff6f61, #f7b733) 1;
-    }
-    .leaflet-container {
-        /* Make it slightly shorter on phones */
-        height: 400px !important;
-      }
-      .map-legend {
-        /* Shrink and reposition legend so it doesn’t cover pins */
-        bottom: 10px;
-        right: 10px;
-        padding: 8px;
-        font-size: 0.8rem;
-      }
-      .map-legend i {
-        width: 10px;
-        height: 10px;
-        margin-right: 4px;
-      }
+  .dashboard-card {
+    border-image: linear-gradient(135deg, #0077ff, #ff6f61, #f7b733) 1;
   }
+
+  .leaflet-container {
+    height: 500px !important; /* Increased map height */
+    margin-top: 10px;
+  }
+
+  .map-legend {
+    bottom: 10px;
+    right: 10px;
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  .map-legend i {
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+  }
+
+  .navbar .btn-dashboard,
+  .navbar .btn-custom {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+}
