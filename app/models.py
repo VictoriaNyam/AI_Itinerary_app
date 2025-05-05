@@ -1,120 +1,174 @@
+from datetime import datetime  
+from app import db, bcrypt  # Database and password hashing  
+from flask_login import UserMixin  # Session management for users
 
-from datetime import datetime 
-from app import db, bcrypt  # Import initialized database and Bcrypt objects from __init__.py
-from flask_login import UserMixin  # Import UserMixin from flask_login to handle user sessions
 
-# User model that integrates Flask-Login
+# User model
+
 class User(UserMixin, db.Model):
-    # The 'User' class represents a user in the application, with authentication and relationships to itineraries
-    id = db.Column(db.Integer, primary_key=True)  # Unique ID for the user
-    username = db.Column(db.String(100), unique=True, nullable=False)  # Unique username
-    email = db.Column(db.String(100), unique=True, nullable=False)  # Unique email
-    password_hash = db.Column(db.String(128), nullable=False)  # Hashed password
-    date_joined = db.Column(db.DateTime, default=datetime.utcnow)  # Date the user joined (defaults to current time)
-    is_admin = db.Column(db.Boolean, default=False)  # Flag to check if the user is an admin
+    # Unique identifier for the user
+    id = db.Column(db.Integer, primary_key=True)  
+    # Username (must be unique)
+    username = db.Column(db.String(100), unique=True, nullable=False)  
+    # Email address (must be unique)
+    email = db.Column(db.String(100), unique=True, nullable=False)  
+    # Hashed password
+    password_hash = db.Column(db.String(128), nullable=False)  
+    # Timestamp when the user joined
+    date_joined = db.Column(db.DateTime, default=datetime.utcnow)  
+    # Flag for admin users
+    is_admin = db.Column(db.Boolean, default=False)  
 
-    # Relationship to itineraries: One-to-many (one user can have many itineraries)
-    itineraries = db.relationship('Itinerary', back_populates='user', cascade='all, delete-orphan')
+    # One-to-many relationship: a user can have multiple itineraries
+    itineraries = db.relationship(
+        'Itinerary', back_populates='user', cascade='all, delete-orphan'
+    )
+    # One-to-many relationship: a user can upload multiple blogs/vlogs
+    uploads = db.relationship(
+        'Upload', back_populates='user', cascade='all, delete-orphan', passive_deletes=True
+    )
 
     def __repr__(self):
-        # String representation of the User object
         return f'<User {self.username}>'
 
-    # Password hashing with Bcrypt: Set the password and hash it
+    # Hash and set the user's password
     def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')  # Generate hashed password
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    # Check the user's entered password against the hashed password
+    # Verify a provided password against the hash
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
 
+
 # Itinerary model
+
 class Itinerary(db.Model):
-    # The 'Itinerary' class represents a travel itinerary linked to a specific user
-    id = db.Column(db.Integer, primary_key=True)  # Unique ID for the itinerary
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to link itinerary to user
-    name = db.Column(db.String(100), nullable=False)  # Name of the itinerary (e.g., "Summer Vacation")
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)  # Date the itinerary was created (defaults to current time)
+    # Unique identifier for the itinerary
+    id = db.Column(db.Integer, primary_key=True)  
+    # Foreign key linking to the user who created the itinerary
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False
+    )
+    # Name given to the itinerary
+    name = db.Column(db.String(100), nullable=False)  
+    # Creation timestamp
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)  
 
-    # Relationship to POIs: One-to-many (one itinerary can have many POIs)
-    pois = db.relationship('POI', back_populates='itinerary', cascade='all, delete-orphan')
-
-    # Relationship to User: One-to-one (each itinerary belongs to one user)
+    # One-to-many: an itinerary contains multiple POIs
+    pois = db.relationship(
+        'POI', back_populates='itinerary', cascade='all, delete-orphan'
+    )
+    # Many-to-one: link back to the creating user
     user = db.relationship('User', back_populates='itineraries')
 
     def __repr__(self):
-        # String representation of the Itinerary object
         return f'<Itinerary {self.name}>'
 
-# POI model for individual points of interest
+
+# POI (Point of Interest) model
+
 class POI(db.Model):
-    # The 'POI' class represents a point of interest (location, activity, etc.)
-    __tablename__ = 'poi'  # Explicitly define the table name in case of naming conflicts
+    __tablename__ = 'poi'  # Explicit table name to avoid conflicts
 
-    id = db.Column(db.Integer, primary_key=True)  # Unique ID for the POI
-    name = db.Column(db.String(255), nullable=False)  # Name of the point of interest
-    address = db.Column(db.String(255))  # Optional address of the POI
-    latitude = db.Column(db.Float)  # Latitude of the POI (for geolocation)
-    longitude = db.Column(db.Float)  # Longitude of the POI (for geolocation)
-    original_latitude = db.Column(db.Float)  # Original latitude (before any transformations)
-    original_longitude = db.Column(db.Float)  # Original longitude (before any transformations)
-    day = db.Column(db.Integer, nullable=False)  # The day number (NOT NULL), represents which day the POI appears on in the itinerary
-    itinerary_id = db.Column(db.Integer, db.ForeignKey('itinerary.id'), nullable=False)  # Foreign key to link POI to itinerary
+    # Unique identifier for the POI
+    id = db.Column(db.Integer, primary_key=True)  
+    # Name of the point of interest
+    name = db.Column(db.String(255), nullable=False)  
+    # Optional address
+    address = db.Column(db.String(255))  
+    # Geolocation fields
+    latitude = db.Column(db.Float)  
+    longitude = db.Column(db.Float)  
+    original_latitude = db.Column(db.Float)  
+    original_longitude = db.Column(db.Float)  
+    # Day number in the itinerary
+    day = db.Column(db.Integer, nullable=False)  
+    # Foreign key linking to the itinerary
+    itinerary_id = db.Column(
+        db.Integer, db.ForeignKey('itinerary.id', ondelete='CASCADE'), nullable=False
+    )
 
-    # Relationship to Itinerary: Many-to-one (many POIs belong to one itinerary)
+    # Link back to the itinerary
     itinerary = db.relationship('Itinerary', back_populates='pois')
 
     def __repr__(self):
-        # String representation of the POI object
         return f"<POI {self.name}>"
 
-# Upload model for user-generated content (blogs or vlogs)
+
+# Upload model for Blogs/Vlogs
+
 class Upload(db.Model):
-    # The 'Upload' class represents user uploads (either a blog or vlog)
-    id = db.Column(db.Integer, primary_key=True)  # Unique ID for the upload
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to link the upload to a user
-    upload_type = db.Column(db.String(10), nullable=False)  # Type of upload ('blog' or 'vlog')
-    filename = db.Column(db.String(120), nullable=True)  # Filename for the blog (if it's a blog)
-    vlog_url = db.Column(db.String(255), nullable=True)  # URL for the vlog (if it's a vlog, could be YouTube or local path)
-    vlog_title = db.Column(db.String(120), nullable=True)  # Title for the vlog (optional)
-    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())  # Timestamp of when the upload was created (defaults to current time)
+    # Unique identifier for each upload
+    id = db.Column(db.Integer, primary_key=True)  
+    # Foreign key linking to the uploading user
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False
+    )
+    # Type of content: 'blog' or 'vlog'
+    upload_type = db.Column(db.String(10), nullable=False)  
+    # For blogs: filename in uploads folder
+    filename = db.Column(db.String(120), nullable=True)  
+    # For vlogs: external URL or file path
+    vlog_url = db.Column(db.String(255), nullable=True)  
+    # Optional title for the vlog
+    vlog_title = db.Column(db.String(120), nullable=True)  
+    # Timestamp of when the upload was created
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())  
 
-    # Relationship to User: One-to-many (one user can have multiple uploads)
+    # Many-to-one: link back to the user
+    user = db.relationship('User', back_populates='uploads')
+    # One-to-many: an upload can have many likes
+    likes = db.relationship(
+        'Like', back_populates='upload', cascade='all, delete-orphan', passive_deletes=True
+    )
+    # One-to-many: an upload can have many comments
+    comments = db.relationship(
+        'Comment', back_populates='upload', cascade='all, delete-orphan', passive_deletes=True
+    )
 
-    likes = db.relationship('Like', backref='upload', cascade='all, delete-orphan', passive_deletes=True)
-    comments = db.relationship('Comment', backref='upload', cascade='all, delete-orphan', passive_deletes=True)
-
-    
-# Like model for handling user likes on uploads
+# Like model for user likes
 class Like(db.Model):
-    # The 'Like' class represents a like on an upload (blog or vlog)
-    id = db.Column(db.Integer, primary_key=True)  # Unique ID for the like
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to link the like to a user
-    upload_id = db.Column(db.Integer, db.ForeignKey('upload.id', ondelete='CASCADE'), nullable=False)  # Foreign key to link the like to an upload
-    
-    # Relationship to User: One-to-many (one user can like many uploads)
-    user = db.relationship('User', backref='likes')
+    # Unique identifier for the like
+    id = db.Column(db.Integer, primary_key=True)  
+    # Foreign key linking to the liking user
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False
+    )
+    # Foreign key linking to the liked upload
+    upload_id = db.Column(
+        db.Integer, db.ForeignKey('upload.id', ondelete='CASCADE'), nullable=False
+    )
 
+    # Many-to-one: link back to the user
+    user = db.relationship('User', backref='likes')
+    # Many-to-one: link back to the upload
+    upload = db.relationship('Upload', back_populates='likes')
 
     def __repr__(self):
-        # String representation of the Like object
         return f'<Like {self.id}>'
 
-# Comment model for handling user comments on uploads
+# Comment model for user comments
+
 class Comment(db.Model):
-    # The 'Comment' class represents a comment on a blog or vlog upload
-    id = db.Column(db.Integer, primary_key=True)  # Unique ID for the comment
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to link the comment to a user
-    upload_id = db.Column(db.Integer, db.ForeignKey('upload.id'), nullable=False)  # Foreign key to link the comment to an upload
-    content = db.Column(db.Text, nullable=False)  # Content of the comment
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp of when the comment was made (defaults to current time)
+    # Unique identifier for the comment
+    id = db.Column(db.Integer, primary_key=True)  
+    # Foreign key linking to the commenting user
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False
+    )
+    # Foreign key linking to the commented upload
+    upload_id = db.Column(
+        db.Integer, db.ForeignKey('upload.id', ondelete='CASCADE'), nullable=False
+    )
+    # Text content of the comment
+    content = db.Column(db.Text, nullable=False)  
+    # Timestamp of when the comment was made
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  
 
-    # Relationship to User: One-to-many (one user can write many comments)
+    # Many-to-one: link back to the user
     user = db.relationship('User', backref='comments')
-
-   
+    # Many-to-one: link back to the upload
+    upload = db.relationship('Upload', back_populates='comments')
 
     def __repr__(self):
-        # String representation of the Comment object
         return f'<Comment {self.id}>'
-
