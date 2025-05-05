@@ -81,6 +81,9 @@ class Upload(db.Model):
 
     # Relationship to User: One-to-many (one user can have multiple uploads)
     user = db.relationship('User', backref=db.backref('uploads', lazy=True), cascade='all, delete-orphan')
+    likes = db.relationship('Like', backref='upload', cascade='all, delete-orphan', passive_deletes=True)
+    comments = db.relationship('Comment', backref='upload', cascade='all, delete-orphan', passive_deletes=True)
+
     
 # Like model for handling user likes on uploads
 class Like(db.Model):
