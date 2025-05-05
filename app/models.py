@@ -80,7 +80,7 @@ class Upload(db.Model):
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())  # Timestamp of when the upload was created (defaults to current time)
 
     # Relationship to User: One-to-many (one user can have multiple uploads)
-    user = db.relationship('User', backref=db.backref('uploads', lazy=True), cascade='all, delete-orphan')
+
     likes = db.relationship('Like', backref='upload', cascade='all, delete-orphan', passive_deletes=True)
     comments = db.relationship('Comment', backref='upload', cascade='all, delete-orphan', passive_deletes=True)
 
