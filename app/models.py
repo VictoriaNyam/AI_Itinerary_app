@@ -95,8 +95,6 @@ class Like(db.Model):
     # Relationship to User: One-to-many (one user can like many uploads)
     user = db.relationship('User', backref='likes')
 
-    # Relationship to Upload: One-to-many (one upload can be liked by many users)
-    upload = db.relationship('Upload', backref='likes')
 
     def __repr__(self):
         # String representation of the Like object
@@ -114,8 +112,7 @@ class Comment(db.Model):
     # Relationship to User: One-to-many (one user can write many comments)
     user = db.relationship('User', backref='comments')
 
-    # Relationship to Upload: One-to-many (one upload can have many comments)
-    upload = db.relationship('Upload', backref='comments')
+   
 
     def __repr__(self):
         # String representation of the Comment object
