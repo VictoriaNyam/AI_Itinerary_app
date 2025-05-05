@@ -90,7 +90,7 @@ class Like(db.Model):
     # The 'Like' class represents a like on an upload (blog or vlog)
     id = db.Column(db.Integer, primary_key=True)  # Unique ID for the like
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to link the like to a user
-    upload_id = db.Column(db.Integer, db.ForeignKey('upload.id'), nullable=False)  # Foreign key to link the like to an upload
+    upload_id = db.Column(db.Integer, db.ForeignKey('upload.id', ondelete='CASCADE'), nullable=False)  # Foreign key to link the like to an upload
     
     # Relationship to User: One-to-many (one user can like many uploads)
     user = db.relationship('User', backref='likes')
