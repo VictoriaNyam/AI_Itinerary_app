@@ -80,8 +80,8 @@ class Upload(db.Model):
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())  # Timestamp of when the upload was created (defaults to current time)
 
     # Relationship to User: One-to-many (one user can have multiple uploads)
-    user = db.relationship('User', backref=db.backref('uploads', lazy=True))
-
+    user = db.relationship('User', backref=db.backref('uploads', lazy=True), cascade='all, delete-orphan')
+    
 # Like model for handling user likes on uploads
 class Like(db.Model):
     # The 'Like' class represents a like on an upload (blog or vlog)
