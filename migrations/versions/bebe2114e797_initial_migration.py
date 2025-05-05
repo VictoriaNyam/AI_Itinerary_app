@@ -26,7 +26,10 @@ def upgrade():
 
     # itinerary table
     with op.batch_alter_table('itinerary', schema=None) as batch_op:
-        batch_op.drop_constraint('itinerary_user_id_fkey', type_='foreignkey')
+        try:
+            batch_op.drop_constraint('itinerary_user_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
         batch_op.create_foreign_key('itinerary_user_id_fkey', 'user', ['user_id'], ['id'], ondelete='CASCADE')
         batch_op.add_column(sa.Column('timestamp', sa.DateTime(), nullable=False, server_default=sa.func.now()))
 
@@ -55,7 +58,10 @@ def upgrade():
             existing_type=sa.VARCHAR(length=50),
             type_=sa.Float(),
             existing_nullable=True)
-        batch_op.drop_constraint('poi_itinerary_id_fkey', type_='foreignkey')
+        try:
+            batch_op.drop_constraint('poi_itinerary_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
         batch_op.create_foreign_key('poi_itinerary_id_fkey', 'itinerary', ['itinerary_id'], ['id'], ondelete='CASCADE')
         batch_op.drop_column('original_longitude')
         batch_op.drop_column('original_latitude')
@@ -66,7 +72,10 @@ def upgrade():
             existing_type=sa.TEXT(),
             type_=sa.String(length=120),
             existing_nullable=True)
-        batch_op.drop_constraint('upload_user_id_fkey', type_='foreignkey')
+        try:
+            batch_op.drop_constraint('upload_user_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
         batch_op.create_foreign_key('upload_user_id_fkey', 'user', ['user_id'], ['id'], ondelete='CASCADE')
 
 
@@ -84,7 +93,10 @@ def downgrade():
     with op.batch_alter_table('poi', schema=None) as batch_op:
         batch_op.add_column(sa.Column('original_latitude', sa.REAL(), nullable=True))
         batch_op.add_column(sa.Column('original_longitude', sa.REAL(), nullable=True))
-        batch_op.drop_constraint('poi_itinerary_id_fkey', type_='foreignkey')
+        try:
+            batch_op.drop_constraint('poi_itinerary_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
         batch_op.create_foreign_key('poi_itinerary_id_fkey', 'itinerary', ['itinerary_id'], ['id'])
         batch_op.alter_column('longitude',
             existing_type=sa.Float(),
@@ -113,12 +125,21 @@ def downgrade():
     # itinerary table
     with op.batch_alter_table('itinerary', schema=None) as batch_op:
         batch_op.drop_column('timestamp')
-        batch_op.drop_constraint('itinerary_user_id_fkey', type_='foreignkey')
+        try:
+            batch_op.drop_constraint('itinerary_user_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
         batch_op.create_foreign_key('itinerary_user_id_fkey', 'user', ['user_id'], ['id'])
 
     # comment table
     with op.batch_alter_table('comment', schema=None) as batch_op:
-        batch_op.drop_constraint('comment_user_id_fkey', type_='foreignkey')
-        batch_op.drop_constraint('comment_upload_id_fkey', type_='foreignkey')
+        try:
+            batch_op.drop_constraint('comment_user_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
+        try:
+            batch_op.drop_constraint('comment_upload_id_fkey', type_='foreignkey')
+        except ValueError:
+            pass  # If the constraint does not exist, do nothing
         batch_op.create_foreign_key('comment_upload_id_fkey', 'upload', ['upload_id'], ['id'])
         batch_op.create_foreign_key('comment_user_id_fkey', 'user', ['user_id'], ['id'])
