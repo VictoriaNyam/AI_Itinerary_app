@@ -18,8 +18,9 @@ depends_on = None
 def upgrade():
     # comment table
     with op.batch_alter_table('comment', schema=None) as batch_op:
-        batch_op.drop_constraint('comment_user_id_fkey', type_='foreignkey')
-        batch_op.drop_constraint('comment_upload_id_fkey', type_='foreignkey')
+        # Commented out to prevent error: No such constraint
+        # batch_op.drop_constraint('comment_user_id_fkey', type_='foreignkey')
+        # batch_op.drop_constraint('comment_upload_id_fkey', type_='foreignkey')
         batch_op.create_foreign_key('comment_user_id_fkey', 'user', ['user_id'], ['id'], ondelete='CASCADE')
         batch_op.create_foreign_key('comment_upload_id_fkey', 'upload', ['upload_id'], ['id'], ondelete='CASCADE')
 
