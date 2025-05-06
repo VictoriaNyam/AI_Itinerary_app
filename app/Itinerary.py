@@ -18,7 +18,7 @@ def load_poi_data():
     return df
 
 # Constants
-K_CLUSTERS = 20          # number of clusters for KMeans
+K_CLUSTERS = 10          # number of clusters for KMeans
 POIS_PER_CLUSTER = 5     # number of POIs to select per cluster
 
 # All possible activity columns
