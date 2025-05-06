@@ -64,6 +64,8 @@ class POI(db.Model):
     address = db.Column(db.String(255))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    original_latitude = db.Column(db.Float)
+    original_longitude = db.Column(db.Float)
     day = db.Column(db.Integer, nullable=False)
     itinerary_id = db.Column(
         db.Integer, db.ForeignKey('itinerary.id', ondelete='CASCADE'), nullable=False
